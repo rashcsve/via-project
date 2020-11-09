@@ -19,7 +19,7 @@ export default {
   /*
    ** Customize the progress-bar color
    */
-  // loading: '~/components/Loading.vue',
+  loading: '~/components/Loading.vue',
   /*
    ** Global CSS
    */
@@ -47,11 +47,11 @@ export default {
     'nuxt-leaflet',
     '@nuxtjs/style-resources'
   ],
-  // styleResources: {
-  //   scss: [
-  //     './assets/css/abstracts/*.scss' // use underscore "_" & also file extension ".scss"
-  //   ]
-  // },
+  styleResources: {
+    scss: [
+      './assets/css/vars.scss' // use underscore "_" & also file extension ".scss"
+    ]
+  },
   /*
    ** Axios module configuration
    ** See https://axios.nuxtjs.org/options
