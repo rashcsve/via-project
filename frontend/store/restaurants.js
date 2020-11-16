@@ -14,6 +14,7 @@ export const getters = {
     return state.restaurants.length
   },
   getCurrentRestaurant(state) {
+    console.log(state.currentRestaurant);
     return state.currentRestaurant
   },
   getDailyMenuDishes(state) {
@@ -71,6 +72,7 @@ export const actions = {
       console.log(e)
       commit('setDailyMenuStatus', false)
     }
+    console.log(data);
     // Set daily menu if it exists
     if (data && data.status === "success" && data.daily_menus.length !== 0) {
       commit('setDailyMenuStatus', true)

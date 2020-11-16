@@ -1,9 +1,9 @@
 <template>
   <Loading v-if="loading" color />
   <div v-else class="restaurant">
-    <h2 class="restaurant__title">
+    <h2 class="title">
       <span>{{citation}}</span>
-      <a :href="restaurant.url" target="_blank" class="restaurant__title--link">
+      <a :href="restaurant.url" target="_blank" class="title--link">
         {{ restaurant.name }}
       </a>
     </h2>
@@ -11,24 +11,19 @@
       <div class="restaurant__details">
         <!-- Cuisines -->
         <div class="restaurant__detail">
-          <h3 class="restaurant__detail-title">Kuchyně:</h3>
+          <h3 class="title--detail">Kuchyně:</h3>
           <div v-for="(emoji, index) in parseCuisine" :key="index" class="restaurant__cuisine-emoji">
             <p class="restaurant__cuisine-emoji-item">{{ emoji }}</p>
           </div>
         </div>
         <!-- Price range -->
         <div class="restaurant__detail">
-          <h3 class="restaurant__detail-title">Cena:</h3>
+          <h3 class="title--detail">Cena:</h3>
           <span>{{ parsePrice }}</span>
-        </div>
-        <!-- User rating -->
-        <div class="restaurant__detail">
-          <h3 class="restaurant__detail-title">Rating:</h3>
-          <!-- <star-rating :rating="+restaurant.user_rating.aggregate_rating" :star-size="starSize" :show-rating="false" :read-only="true" :increment="0.01"></star-rating> -->
         </div>
         <!-- Take Away -->
         <div class="restaurant__detail">
-          <h3 class="restaurant__detail-title">Jídlo s sebou:</h3>
+          <h3 class="title--detail">Jídlo s sebou:</h3>
           <span
             v-if="hasTakeAway(restaurant.highlights)"
             >👍
@@ -37,22 +32,13 @@
         </div>
         <!-- Credit Card -->
         <div class="restaurant__detail">
-          <h3 class="restaurant__detail-title">Platba kartou:</h3>
+          <h3 class="title--detail">Platba kartou:</h3>
           <span
             v-if="hasCreditCard(restaurant.highlights)"
             >👍
           </span>
           <span v-else>👎</span>
         </div>
-        <!-- Pet Friendly -->
-        <!-- <div class="restaurant__detail">
-          <h3 class="restaurant__detail-title">Domácí mazlíčci:</h3>
-          <span
-            v-if="hasPetFriendly(restaurant.highlights)"
-            >👍
-          </span>
-          <span v-else>👎</span>
-        </div> -->
       </div>
       <div class="restaurant__menu">
         <!-- Daily Menu -->
@@ -63,6 +49,7 @@
     <div class="restaurants__buttons">
       <button @click="refreshDailyMenu" class="restaurants__button--refresh">Chci další!</button>
       <button @click="showLocationMap" class="restaurants__button--location">Kde to je?</button>
+      <nuxt-link to="/add-menu" class="button-link restaurants__button--restaurant">Přidat denní menu</nuxt-link>
     </div>
   </div>
 </template>
@@ -217,7 +204,7 @@ export default {
     margin-top: 20px;
   }
 }
-.restaurant__detail-title {
+.title--detail {
   margin-right: 8px;
 }
 .restaurant__cuisine-emoji {
