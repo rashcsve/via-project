@@ -49,7 +49,7 @@
     <div class="restaurants__buttons">
       <button @click="refreshDailyMenu" class="restaurants__button--refresh">Chci další!</button>
       <button @click="showLocationMap" class="restaurants__button--location">Kde to je?</button>
-      <nuxt-link to="/add-menu" class="button-link restaurants__button--restaurant">Přidat denní menu</nuxt-link>
+      <nuxt-link to="/add-menu" class="button-link button-link--center restaurants__button--restaurant">Přidat denní menu</nuxt-link>
     </div>
   </div>
 </template>

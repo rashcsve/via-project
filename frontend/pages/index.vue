@@ -8,19 +8,23 @@
         </div>
         <restaurant v-if="location" />
       </div>
+      <!-- Map Sidebar -->
+      <div v-if="showLocation" class="container__geolocation-wrap">
+        <geolocation-map />
+      </div>
     </div>
   </client-only>
 </template>
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
-// import GeolocationMap from '~/components/GeolocationMap'
+import GeolocationMap from '~/components/GeolocationMap'
 import Restaurant from '~/components/Restaurant'
 import Loading from '~/components/Loading'
 
 export default {
   components: {
-    // GeolocationMap,
+    GeolocationMap,
     Restaurant,
     Loading
   },
