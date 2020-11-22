@@ -5,7 +5,7 @@
         <h2 class="title title--added">
           Přidej svoje menu!
         </h2>
-        <form name="add-menu" @click="save" class="form">
+        <form name="add-menu" @submit.prevent="save" class="form">
           <div class="form__container">
             <div class="form__left">
               <!-- Name -->
@@ -20,15 +20,15 @@
                 <label class="title--detail" for="address">
                   Adresa
                 </label>
-                <input class="form-field" required name="address" id="address" v-model="restaurant.location.address" />
+                <input class="form-field" required name="address" id="address" v-model="restaurant.location" />
               </div>
               <!-- Cuisine -->
               <div class="form__box">
                 <label class="title--detail" for="cuisine">
                   Kuchyň
                 </label>
-                <!-- <input class="form-field" required name="cuisine" id="cuisine" v-model="restaurant.cuisines" /> -->
-                <select v-model="restaurant.cuisines">
+                <!-- TODO Make it required -->
+                <select v-model="restaurant.cuisines" class="form-field form-field__select">
                   <option disabled value="">Vyberte prosím</option>
                   <option v-for="cuisine in Object.entries(cuisines)">{{ cuisine[1].translation }}</option>
                 </select>
@@ -38,7 +38,8 @@
                 <label class="title--detail" for="price">
                   Cenová hladina
                 </label>
-                <select v-model="restaurant.price_range">
+                <!-- TODO Make it required -->
+                <select v-model="restaurant.price_range" class="form-field form-field__select">
                   <option disabled value="">Vyberte prosím</option>
                   <option v-for="option in 5">{{ option }}</option>
                 </select>
@@ -70,14 +71,15 @@
               </label>
               <div class="form__box" v-for="dish in dishes">
                 <input class="form-field" placeholder="Jídlo" v-model="dish.name" />
-                <input class="form-field" placeholder="Cena" v-model="dish.price" />
+                <input class="form-field form-field--small" placeholder="Cena" v-model="dish.price" />
+                <p class="form-label">Kč</p>
               </div>
               <div class="button-link button-link--white" @click="addDish">
                 Přidat další jídlo
               </div>
             </div>
           </div>
-          <button class="button-link" type="submit">
+          <button class="button-link button-link--center" type="submit">
             Přidat restauraci
           </button>
         </form>
@@ -87,7 +89,6 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex'
 import { cuisines } from "../static/cuisines"
 
 export default {
@@ -104,20 +105,15 @@ export default {
       ],
       restaurant: {
         custom: true,
+        date: "",
         name: "",
         cuisines: "",
         price_range: 1,
         highlights: [],
-        location: {
-          address: ""
-        }
+        location: "",
+        dishes: []
       }
     }
-  },
-  computed: {
-    ...mapGetters({
-      showLocation: 'currentRestaurant/getShowLocation'
-    })
   },
   methods: {
     addDish() {
@@ -128,12 +124,16 @@ export default {
       this.dishes.push(newDish);
     },
     save() {
+      if (this.hasTakeaway) {
+        this.restaurant.highlights.push("Takeaway Available");
+      }
+      if (this.hasCreditCard) {
+        this.restaurant.highlights.push("Credit Card");
+      }
+      this.restaurant.dishes = [...this.dishes];
+      this.restaurant.date = new Date.now();
       console.log(this.restaurant);
     }
   }
 }
 </script>
-
-<style lang="scss">
-
-</style>
