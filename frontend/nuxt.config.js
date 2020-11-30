@@ -16,6 +16,9 @@ export default {
     ],
     link: [{ rel: 'icon', type: 'image/x-icon', href: '/favicon.ico' }]
   },
+  env: {
+    HOST_URL: process.env.HOST_URL || 'http://127.0.0.1:5000'
+  },
   /*
    ** Customize the progress-bar color
    */
