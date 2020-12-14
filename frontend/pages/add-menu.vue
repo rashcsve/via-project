@@ -1,7 +1,7 @@
 <template>
   <client-only>
     <div class="container">
-      <div class="container__inner container--form">
+      <div class="container__inner container--form"  v-if="!wasAdded">
         <h2 class="title title--added">
           Přidej svoje menu!
         </h2>
@@ -70,8 +70,8 @@
                 Denní menu
               </label>
               <div class="form__box" v-for="dish in dishes">
-                <input class="form-field" placeholder="Jídlo" v-model="dish.name" />
-                <input class="form-field form-field--small" placeholder="Cena" v-model="dish.price" />
+                <input class="form-field" required placeholder="Jídlo" v-model="dish.name" />
+                <input class="form-field form-field--small" required placeholder="Cena" v-model="dish.price" />
                 <p class="form-label">Kč</p>
               </div>
               <div class="button-link button-link--white" @click="addDish">
@@ -84,16 +84,23 @@
           </button>
         </form>
       </div>
+      <div class="container__inner container--form container--added" v-else>
+        <h2 class="title title--added">Menu této restaurace bylo úspěšně přidáno</h2>
+        <nuxt-link to="/" class="button-link button-link--center restaurants__button--restaurant">Vrátit se na domovskou stránku</nuxt-link>
+      </div>
     </div>
   </client-only>
 </template>
 
 <script>
+import axios from 'axios'
 import { cuisines } from "../static/cuisines"
 
 export default {
   data(){
     return {
+      wasAdded: false,
+      restaurantId: "",
       hasTakeaway: false,
       cuisines: cuisines,
       hasCreditCard: false,
@@ -123,7 +130,7 @@ export default {
       };
       this.dishes.push(newDish);
     },
-    save() {
+    async save() {
       if (this.hasTakeaway) {
         this.restaurant.highlights.push("Takeaway Available");
       }
@@ -131,8 +138,23 @@ export default {
         this.restaurant.highlights.push("Credit Card");
       }
       this.restaurant.dishes = [...this.dishes];
-      this.restaurant.date = new Date.now();
-      console.log(this.restaurant);
+      this.restaurant.date = new Date();
+      try {
+        const response = await axios.post(
+          'http://localhost:5000/new',
+          { "restaurant": { ...this.restaurant } },
+          { headers: { 'Content-Type': 'application/json' } }
+        )
+        this.wasAdded = true;
+        console.log(response);
+        this.restaurantId = response.data;
+        this.addToLocalStorage();
+      } catch (error) {
+        console.log(error)
+      }
+    },
+    addToLocalStorage() {
+      localStorage.setItem('restaurant', this.restaurantId )
     }
   }
 }

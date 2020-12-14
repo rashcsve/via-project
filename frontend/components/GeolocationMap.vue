@@ -2,14 +2,14 @@
   <div class="geolocation-map" @click="setShowLocation(false)">
     <div id="map-wrap">
       <client-only>
-        <l-map :zoom=18 :center="[restaurant.location.latitude, restaurant.location.longitude]">
+        <l-map :zoom="zoom" :center="getLatLng">
           <l-tile-layer :url="getTileLayerUrl"></l-tile-layer>
-          <l-marker :lat-lng="[restaurant.location.latitude, restaurant.location.longitude]"></l-marker>
+          <l-marker :lat-lng="getLatLng"></l-marker>
         </l-map>
       </client-only>
     </div>
     <div class="geolocation-map__info" @click="setShowLocation(false)">
-      <h3>{{ restaurant.location.address }}</h3>
+      <h3>{{ getAddress }}</h3>
       <img src="~/assets/icons/close.svg" class="geolocation-map__close">
     </div>
   </div>
@@ -26,6 +26,22 @@ import { mapGetters, mapMutations } from 'vuex'
         const id = 'mapbox/streets-v11'
         const accessToken = 'pk.eyJ1IjoicmFzaGNzdmUiLCJhIjoiY2s1MndqejFhMDI2djNmbWRoaGNlamtyMSJ9.knNK82pHuyzWHVA-UrlLYQ'
         return `https://api.mapbox.com/styles/v1/${id}/tiles/{z}/{x}/{y}?access_token=${accessToken}`
+      },
+      getLatLng() {
+        if (this.restaurant.custom) {
+          this.zoom = 12;
+          return ["50.0755", "14.4378"] // Prague coordinates
+        } else {
+          this.zoom = 18;
+          return [this.restaurant.location.latitude, this.restaurant.location.longitude];
+        }
+      },
+      getAddress() {
+        if (this.restaurant.custom) {
+          return this.restaurant.location;
+        } else {
+          return this.restaurant.location.address;
+        }
       }
     },
     methods:{

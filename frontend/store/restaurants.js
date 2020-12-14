@@ -81,19 +81,29 @@ export const actions = {
       commit('setDailyMenuStatus', false)
     }
   },
-  async getRandomRestaurant({ commit, state }) {
-    try {
-      if (state.restaurants.length > 0) {
-        const randomRestaurant = state.restaurants[Math.floor(Math.random() * state.restaurants.length)];
-        if (randomRestaurant) {
-          return commit('setCurrentResturant', randomRestaurant.restaurant)
-        }
-      } else {
-        console.log("No restaurants found")
-      }
-    } catch(e) {
-      console.log(e)
+  setDishes({commit}, dishes) {
+    if (dishes.length > 0 && (dishes[0].price && dishes[0].name)) {
+      commit('setDailyMenuStatus', true)
+      commit('setDailyMenu', dishes)
     }
+  },
+  async getRandomRestaurant({ commit, state }, readLocalStorage) {
+      try {
+        const restaurantId = localStorage.getItem("restaurant");
+        if (restaurantId && readLocalStorage) {
+          const dbRestaurant = await this.$axios.$get(`http://0.0.0.0:5000/id/${restaurantId}`);
+          return commit('setCurrentResturant', dbRestaurant);
+        } else if (state.restaurants.length > 0) {
+          const randomRestaurant = state.restaurants[Math.floor(Math.random() * state.restaurants.length)];
+          if (randomRestaurant) {
+            return commit('setCurrentResturant', randomRestaurant.restaurant);
+          }
+        } else {
+          console.log("No restaurants found")
+        }
+      } catch(e) {
+        console.log(e)
+      }
   },
   async getNearbyRestaurants({ commit, rootGetters }) {
     const location = rootGetters['location/getLocation']

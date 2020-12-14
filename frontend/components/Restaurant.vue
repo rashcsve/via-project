@@ -1,6 +1,6 @@
 <template>
   <Loading v-if="loading" color />
-  <div v-else class="restaurant">
+  <div v-else-if="!loading && !error" class="restaurant">
     <h2 class="title">
       <span>{{citation}}</span>
       <a :href="restaurant.url" target="_blank" class="title--link">
@@ -47,10 +47,13 @@
       </div>
     </div>
     <div class="restaurants__buttons">
-      <button @click="refreshDailyMenu" class="restaurants__button--refresh">Chci další!</button>
+      <button @click="refreshDailyMenu(false)" class="restaurants__button--refresh">Chci další!</button>
       <button @click="showLocationMap" class="restaurants__button--location">Kde to je?</button>
       <nuxt-link to="/add-menu" class="button-link button-link--center restaurants__button--restaurant">Přidat denní menu</nuxt-link>
     </div>
+  </div>
+  <div v-else-if="error" class="title--added">
+    Není žádné menu :/
   </div>
 </template>
 
@@ -72,7 +75,8 @@ export default {
       loading: false,
       citation: null,
       hasMenu: false,
-      starSize: 16
+      starSize: 16,
+      error: false
     }
   },
   // Load nearby restaurants by location and get a random restaurant with the daily menu
@@ -80,7 +84,7 @@ export default {
     try {
       this.loading = true
       await this.getNearbyRestaurants()
-      await this.refreshDailyMenu()
+      await this.refreshDailyMenu(true)
     } catch (e) {
       console.log(e)
     }
@@ -107,7 +111,8 @@ export default {
     ...mapActions({
       getNearbyRestaurants: 'restaurants/getNearbyRestaurants',
       getRandomRestaurant: 'restaurants/getRandomRestaurant',
-      getDailyMenu: 'restaurants/getDailyMenu'
+      getDailyMenu: 'restaurants/getDailyMenu',
+      setDishes: 'restaurants/setDishes'
     }),
     hasCreditCard(highlights) {
       return highlights.includes("Credit Card");
@@ -118,20 +123,27 @@ export default {
     hasPetFriendly(highlights) {
       return highlights.includes("Pet Friendly");
     },
-    async refreshDailyMenu() {
+    async refreshDailyMenu(readLocalStorage) {
       try {
         this.loading = true
         this.closeLocationMap()
         this.citation = getCitation()
         while(!this.hasMenu) {
-          await this.getRandomRestaurant()
-          await this.getDailyMenu()
-          this.hasMenu = await this.isDailyMenu
+          await this.getRandomRestaurant(readLocalStorage)
+          if (this.restaurant.custom && readLocalStorage) {
+            this.setDishes(this.restaurant.dishes)
+            this.hasMenu = true;
+          } else {
+            await this.getDailyMenu()
+            this.hasMenu = await this.isDailyMenu
+          }
         }
         this.loading = false
         this.hasMenu = false
       } catch (e) {
         console.log(e)
+        this.loading = false
+        this.error = true;
       }
     },
     showLocationMap() {
@@ -211,7 +223,7 @@ export default {
   display: flex;
 }
 .restaurant__menu {
-  width: 500px;
+  width: 800px;
   margin: 30px;
   @media screen and (max-width: $tablet) {
     width: 100%;

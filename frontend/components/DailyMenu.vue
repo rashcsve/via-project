@@ -1,14 +1,14 @@
 <template>
   <section class="daily-menu">
     <h3>Denní menu 🧾:</h3>
-    <div v-for="dish in dishes" :key="dish.dish.id" class="daily-menu__dishes">
-      <div v-if="hasPrice(dish.dish.price)" class="flex">
+    <div v-for="(dish, i) in dishes" :key="i" class="daily-menu__dishes">
+      <div v-if="hasPrice(dish)" class="flex">
         <div>
-          {{ dish.dish.name }} za
-          <span class="daily-menu__price">{{ dish.dish.price }}</span>
+          {{ dishName(dish) }} za
+          <span class="daily-menu__price">{{ dishPrice(dish) }}</span>
         </div>
       </div>
-      <div class="font-bold" v-else>{{dish.dish.name}}</div>
+      <div class="font-bold" v-else>{{ dishName(dish) }}</div>
     </div>
   </section>
 </template>
@@ -22,8 +22,44 @@ export default {
     }
   },
   methods: {
+    isCustom(dish) {
+      console.log(dish)
+      if (Object.keys(dish).length > 0 && (dish.price || dish.name)) {
+        console.log(dish)
+        return true;
+      } else if (Object.keys(dish).length > 0 && dish.dish && Object.keys(dish.dish).length > 0 ) {
+        console.log(dish.dish)
+        return false;
+      }
+      return false;
+    },
     hasPrice(dish) {
-      return dish && dish !== "2020";
+      console.log(this.isCustom(dish));
+      if (this.isCustom(dish) && dish.price) {
+        return true;
+      }
+      if (!this.isCustom(dish) && dish.dish && dish.dish.price && dish.dish.price !== "2020") {
+        return true;
+      }
+      return false;
+    },
+    dishName(dish) {
+      if (this.isCustom && dish.name) {
+        return dish.name;
+      }
+      if (!this.isCustom(dish) && dish.dish && dish.dish.name) {
+        return dish.dish.name
+      }
+      return ""
+    },
+    dishPrice(dish) {
+      if (!this.isCustom(dish) && dish.dish && dish.dish.price) {
+        return dish.dish.price
+      }
+       if (this.isCustom && dish.price) {
+        return dish.price;
+      }
+      return ""
     }
   }
 };
