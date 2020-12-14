@@ -2,16 +2,18 @@ import os
 import json
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
-from bson import ObjectId
+from bson import ObjectId, json_util
 from flask_cors import CORS
 
-app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "http://127.0.0.1:3000"}})
+flask = Flask(__name__)
+CORS(flask, resources={r"/*": {"origins": "http://127.0.0.1:3000"}})
 
 # To change accordingly 
 print(os.environ)
-client = MongoClient("db", 27017)
-db = client.appdb
+# client = MongoClient("db", 27017)
+# db = client.appdb
+client = MongoClient("mongodb+srv://user:useruser@via.eforv.mongodb.net/via?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE")
+db=client.menus
 
 
 class JSONEncoder(json.JSONEncoder):
@@ -21,30 +23,24 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-@app.route("/")
+@flask.route("/", methods=["GET"])
 def index():
-    _items = db.appdb.find()
+    _items = db.restaurants.find()
     items = [items for items in _items]
-
     print(request.headers)
-    if request.headers['Accept'] == 'application/json':
-        return jsonify(JSONEncoder().encode(items)), 200
-    else:
-        return render_template("index.html", items=items)
+    return jsonify(JSONEncoder().encode(items)), 200
 
-
-@app.route("/new", methods=["POST"])
+@flask.route("/new", methods=["POST"])
 def new():
     print(request.json)
-    data = {
-        "text": request.json["text"] if request.content_type == 'application/json' else request.form["text"]
-    }
+    result = db.restaurants.insert_one(request.json["restaurant"])
+    return str(result.inserted_id)
 
-    db.appdb.insert_one(data)
-
-    return redirect(url_for("index"))
-
+@flask.route("/id/<_id>", methods=["GET"])
+def getId(_id):
+    restaurant = db.restaurants.find_one({'_id': ObjectId(_id) })
+    return json.dumps(restaurant, default=json_util.default)
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0", debug=True)
+    flask.run(host="0.0.0.0", debug=True)
 
