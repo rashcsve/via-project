@@ -23,18 +23,14 @@ export default {
   },
   methods: {
     isCustom(dish) {
-      console.log(dish)
       if (Object.keys(dish).length > 0 && (dish.price || dish.name)) {
-        console.log(dish)
         return true;
       } else if (Object.keys(dish).length > 0 && dish.dish && Object.keys(dish.dish).length > 0 ) {
-        console.log(dish.dish)
         return false;
       }
       return false;
     },
     hasPrice(dish) {
-      console.log(this.isCustom(dish));
       if (this.isCustom(dish) && dish.price) {
         return true;
       }

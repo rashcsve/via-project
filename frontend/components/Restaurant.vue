@@ -94,7 +94,8 @@ export default {
       dailyMenuDishes: 'restaurants/getDailyMenuDishes',
       isDailyMenu: 'restaurants/getDailyMenuStatus',
       restaurant: 'restaurants/getCurrentRestaurant',
-      showLocation: 'currentRestaurant/getShowLocation'
+      showLocation: 'currentRestaurant/getShowLocation',
+      restaurants: 'restaurants/getRestaurants'
     }),
     parsePrice() {
       return "💸".repeat(this.restaurant.price_range)
@@ -135,7 +136,10 @@ export default {
             this.hasMenu = true;
           } else {
             await this.getDailyMenu()
-            this.hasMenu = await this.isDailyMenu
+            this.hasMenu = this.isDailyMenu
+            if (this.restaurants.length < 5) {
+              await this.getNearbyRestaurants()
+            }
           }
         }
         this.loading = false
