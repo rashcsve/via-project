@@ -2,15 +2,12 @@
   <client-only>
     <div class="container">
       <div :class="{'container__inner':true, 'container__inner--open': showLocation}">
+        <h2 class="title title--added">Denní Menu v tvém okolí</h2>
         <Loading v-if="gettingLocation" color />
         <div v-if="locationError" class="container__error">
           Oops, nemohu zjistit tvoji geolokaci, abys používal appku :( Povol to, prosím
         </div>
-        <restaurant v-if="location" />
-      </div>
-      <!-- Map Sidebar -->
-      <div v-if="showLocation" class="container__geolocation-wrap">
-        <geolocation-map />
+        <!-- <restaurant v-if="location" /> -->
       </div>
     </div>
   </client-only>
@@ -18,13 +15,11 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
-import GeolocationMap from '~/components/GeolocationMap'
 import Restaurant from '~/components/Restaurant'
 import Loading from '~/components/Loading'
 
 export default {
   components: {
-    GeolocationMap,
     Restaurant,
     Loading
   },
