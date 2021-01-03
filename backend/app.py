@@ -6,9 +6,9 @@ from bson import ObjectId, json_util
 from flask_cors import CORS
 
 flask = Flask(__name__)
-CORS(flask, resources={r"/*": {"origins": "http://127.0.0.1:3000"}})
+CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
 
-# To change accordingly 
+# To change accordingly
 print(os.environ)
 # client = MongoClient("db", 27017)
 # db = client.appdb

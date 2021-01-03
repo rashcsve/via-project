@@ -60,7 +60,7 @@ export const actions = {
   },
   async getDailyMenu({state, commit}) {
     let data = {
-      daily_menus: [] 
+      daily_menus: []
     }
     try {
       data = await this.$axios.$get('dailymenu', {
@@ -91,7 +91,7 @@ export const actions = {
       try {
         const restaurantId = localStorage.getItem("restaurant");
         if (restaurantId && readLocalStorage) {
-          const dbRestaurant = await this.$axios.$get(`http://0.0.0.0:5000/id/${restaurantId}`);
+          const dbRestaurant = await this.$axios.$get(`http://localhost:5000/id/${restaurantId}`);
           return commit('setCurrentResturant', dbRestaurant);
         } else if (state.restaurants.length > 0) {
           const randomRestaurant = state.restaurants[Math.floor(Math.random() * state.restaurants.length)];
