@@ -1,23 +1,29 @@
 # Creates an docker image
 FROM node:12
 
-ADD ./package.json /app/package.json
-# ADD ./package-lock.json /app/package-lock.json
-ADD ./nuxt.config.js /app/nuxt.config.js
-ADD . /app/
-
+# create destination directory
+RUN mkdir -p /app
 WORKDIR /app
-# ADD . /app/
 
-# # global install & update
-RUN npm i yarn
+# # update and install dependency
+# RUN apk update && apk upgrade
+# RUN apk add git
 
-# # RUN rm yarn.lock
-RUN yarn
-RUN yarn build
+# copy the app, note .dockerignore
+COPY . /app
+RUN npm install
 
-# ENV HOST 0.0.0.0
-# EXPOSE 3000
+# build necessary, even if no static files are needed,
+# since it builds the server as well
+RUN npm run build
 
-# start command
-CMD [ "yarn", "start" ]
+# expose 8080 on container
+EXPOSE 8080
+
+# set app serving to permissive / assigned
+ENV NUXT_HOST=0.0.0.0
+# set app port
+ENV NUXT_PORT=8080
+
+# start the app
+CMD [ "npm", "start" ]
