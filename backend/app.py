@@ -6,7 +6,7 @@ from bson import ObjectId, json_util
 from flask_cors import CORS
 
 flask = Flask(__name__)
-CORS(flask, resources={r"/*": {"origins": "http://localhost:8080"}})
+CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 # To change accordingly
 print(os.environ)
