@@ -3,7 +3,8 @@ export const state = () => ({
   currentRestaurant: null,
   restaurants: [],
   dailyMenuDishes: null,
-  isDailyMenu: false
+  isDailyMenu: false,
+  offset: 0
 });
 
 export const getters = {
@@ -14,7 +15,6 @@ export const getters = {
     return state.restaurants.length
   },
   getCurrentRestaurant(state) {
-    console.log(state.currentRestaurant);
     return state.currentRestaurant
   },
   getDailyMenuDishes(state) {
@@ -43,6 +43,14 @@ export const mutations = {
   },
   setDailyMenuStatus(state, payload) {
     state.isDailyMenu = payload
+  },
+  setOffset(state) {
+    state.offset += 20
+  },
+  removeRestaurant(state, payload) {
+    state.restaurants = state.restaurants.filter(res => {
+      return res.restaurant.id !== payload
+    })
   }
 }
 
@@ -69,16 +77,16 @@ export const actions = {
         }
       })
     } catch(e) {
-      console.log(e)
       commit('setDailyMenuStatus', false)
+      commit('removeRestaurant', state.currentRestaurant.id)
     }
-    console.log(data);
     // Set daily menu if it exists
     if (data && data.status === "success" && data.daily_menus.length !== 0) {
       commit('setDailyMenuStatus', true)
       commit('setDailyMenu', data.daily_menus[0].daily_menu.dishes)
     } else {
       commit('setDailyMenuStatus', false)
+      commit('removeRestaurant', state.currentRestaurant.id)
     }
   },
   setDishes({commit}, dishes) {
@@ -105,7 +113,7 @@ export const actions = {
         console.log(e)
       }
   },
-  async getNearbyRestaurants({ commit, rootGetters }) {
+  async getNearbyRestaurants({ state, commit, rootGetters }) {
     const location = rootGetters['location/getLocation']
     const geocode = await this.$axios.$get('geocode', {
       params: {
@@ -113,14 +121,17 @@ export const actions = {
         lon: location.longitude
       }
     })
+    console.log(state.offset);
     const { data } = await this.$axios.get('search', {
       params: {
         entity_type: geocode.location.entity_type,
-        entity_id: geocode.location.entity_id
+        entity_id: geocode.location.entity_id,
+        offset: state.offset
       }
     })
     if (data.restaurants.length !== 0) {
       commit('setRestaurants', data.restaurants)
     }
+    commit('setOffset');
   }
 }

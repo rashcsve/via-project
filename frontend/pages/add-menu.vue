@@ -82,6 +82,7 @@
           <button class="button-link button-link--center" type="submit">
             Přidat restauraci
           </button>
+          <nuxt-link to="/" class="button-link button-link--back restaurants__button--location">Vrátit se na domovskou stránku</nuxt-link>
         </form>
       </div>
       <div class="container__inner container--form container--added" v-else>
