@@ -1,13 +1,12 @@
 <template>
   <client-only>
     <div class="container">
-      <div :class="{'container__inner':true, 'container__inner--open': showLocation}">
+      <div class="container__inner container__index">
         <h2 class="title title--added">Denní Menu v tvém okolí</h2>
-        <Loading v-if="gettingLocation" color />
-        <div v-if="locationError" class="container__error">
-          Oops, nemohu zjistit tvoji geolokaci, abys používal appku :( Povol to, prosím
-        </div>
-        <!-- <restaurant v-if="location" /> -->
+        <h3 class="date">{{ getDate }}</h3>
+        <Loading v-if="gettingRestaurants" color />
+        <p v-if="error">{{ error }}</p>
+        <restaurant-box v-else v-for="(rest, i) in restaurants" :key="i" :data="rest" />
       </div>
     </div>
   </client-only>
@@ -15,50 +14,44 @@
 
 <script>
 import { mapMutations, mapGetters } from 'vuex'
-import Restaurant from '~/components/Restaurant'
+import RestaurantBox from '~/components/RestaurantBox'
 import Loading from '~/components/Loading'
 
 export default {
   components: {
-    Restaurant,
+    RestaurantBox,
     Loading
   },
   data(){
     return {
-      location: null,
-      gettingLocation: false,
-      locationError: null
+      gettingRestaurants: false,
+      restaurants: null,
+      error: null
     }
   },
   async created() {
-    // Do we support geolocation
-    if (process.client) {
-      this.gettingLocation = true;
-      if(!("geolocation" in navigator)) {
-        this.locationError = 'Geolocation is not available.';
-        this.gettingLocation = false;
-        return;
-      }
-      let position = await this.getPosition();
-      this.setLocation(position.coords)
-      this.location = position;
-      this.gettingLocation = false;
+    try {
+      this.gettingRestaurants = true
+      this.restaurants = await this.getRestaurants
+      this.gettingRestaurants = false
+    } catch (e) {
+      console.log(e)
+      this.error = "Nemůžu najít žádné menu. Hm, zkus později"
     }
   },
   computed: {
     ...mapGetters({
-      showLocation: 'currentRestaurant/getShowLocation'
-    })
-  },
-  methods: {
-    ...mapMutations({
-      setLocation: 'location/setLocation'
+      getRestaurants: 'restaurants/getRestaurants'
     }),
-    getPosition() {
-      return new Promise((res, rej) => {
-        navigator.geolocation.getCurrentPosition(res, rej);
-      });
+    getDate() {
+      return new Date().toLocaleDateString()
     }
   }
 }
 </script>
+
+<style lang="scss">
+.date {
+  margin-bottom: 24px;
+}
+</style>

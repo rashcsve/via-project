@@ -60,9 +60,8 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL: 'https://developers.zomato.com/api/v2.1/',
+    baseURL:  process.env.BASE_URL || 'http://localhost:5000/api',
     headers: {
-      'user-key': 'cbd3a114b35a5ae4bd5232a54a7e6e88',
       Accept: 'application/json'
     }
   },

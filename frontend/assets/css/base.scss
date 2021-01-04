@@ -6,10 +6,10 @@ body {
   position: relative;
   color: $color-black;
   height: 100%;
-  background-image: linear-gradient(-45deg,$color-red,$color-blue);
+  background-image: linear-gradient(-45deg, $color-red, $color-blue);
   animation: gradient 10s infinite alternate;
   font-family: 'Source Sans Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI',
-  Roboto, 'Helvetica Neue', Arial, sans-serif;
+    Roboto, 'Helvetica Neue', Arial, sans-serif;
 
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
@@ -27,13 +27,15 @@ h3 {
   font-style: italic;
   font-size: 1.5rem;
   text-transform: uppercase;
+  margin: auto;
 
   @media screen and (max-width: $tablet) {
     font-size: 1rem;
   }
 }
 
-button, .button-link {
+button,
+.button-link {
   padding: 0 30px 0 15px;
   border-radius: 30px;
   max-width: 200px;
@@ -88,6 +90,10 @@ button, .button-link {
   height: calc(100% - 40px);
   top: 20px;
   left: 20px;
+}
+.container__index {
+  overflow-y: scroll;
+  padding-bottom: 32px;
 }
 .container__inner {
   position: absolute;
@@ -157,7 +163,13 @@ button, .button-link {
     text-fill-color: transparent;
     -webkit-text-fill-color: transparent;
     background-color: $color-violet;
-    background-image: linear-gradient(to right,$color-violet 0%,$color-violet 30%,$color-pink 70%,$color-pink 100%);
+    background-image: linear-gradient(
+      to right,
+      $color-violet 0%,
+      $color-violet 30%,
+      $color-pink 70%,
+      $color-pink 100%
+    );
   }
 
   @media screen and (max-width: $tablet) {
@@ -214,7 +226,7 @@ button, .button-link {
 .restaurants__button--refresh {
   background-color: $color-red;
   &::before {
-    content: "\01F504";
+    content: '\01F504';
     position: relative;
     left: 0;
     font-size: 36px;
@@ -234,7 +246,7 @@ button, .button-link {
 .restaurants__button--location {
   background-color: $color-blue;
   &::before {
-    content: "\01F4CD";
+    content: '\01F4CD';
     position: relative;
     left: 0;
     top: -15px;
@@ -245,7 +257,7 @@ button, .button-link {
   }
   &:hover {
     &::before {
-    transform: scale(1.2);
+      transform: scale(1.2);
     }
   }
 }
