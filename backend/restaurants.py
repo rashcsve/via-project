@@ -39,8 +39,10 @@ def getDailyMenus(restaurants):
     for rest in restaurants:
         result = getDailyMenu(rest)
         menu = result.json()
+        currentRestaurant = dict(rest)
         if result.status_code == 200 and menu["daily_menus"]:
-            data.append(menu)
+            currentRestaurant.update(menu)
+            data.append(currentRestaurant)
     print(len(data))
     return data
 

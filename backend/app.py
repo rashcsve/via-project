@@ -1,6 +1,5 @@
 import os
 import json
-import requests
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
 from bson import ObjectId, json_util
@@ -20,13 +19,6 @@ client = MongoClient(
 db = client.menus
 
 
-@flask.route("/api/restaurants", methods=["GET"])
-def restaurants():
-    restaurants = getNearestRestaurants()
-    data = getDailyMenus(restaurants)
-    return json.dumps(data)
-
-
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
         if isinstance(o, ObjectId):
@@ -34,22 +26,24 @@ class JSONEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, o)
 
 
-@flask.route("/", methods=["GET"])
-def index():
-    _items = db.restaurants.find()
-    items = [items for items in _items]
-    print(request.headers)
-    return jsonify(JSONEncoder().encode(items)), 200
+@flask.route("/api/restaurants", methods=["GET"])
+def restaurants():
+    restaurants = getNearestRestaurants()
+    data = getDailyMenus(restaurants)
+
+    dbItems = db.restaurants.find()
+    dbRestaurants = [items for items in dbItems]
+    data.insert(0, JSONEncoder().encode(dbRestaurants))
+    return json.dumps(data)
 
 
-@flask.route("/new", methods=["POST"])
+@flask.route("/api/new", methods=["POST"])
 def new():
-    print(request.json)
     result = db.restaurants.insert_one(request.json["restaurant"])
     return str(result.inserted_id)
 
 
-@flask.route("/id/<_id>", methods=["GET"])
+@flask.route("/api/id/<_id>", methods=["GET"])
 def getId(_id):
     restaurant = db.restaurants.find_one({"_id": ObjectId(_id)})
     return json.dumps(restaurant, default=json_util.default)
