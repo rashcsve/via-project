@@ -18,9 +18,14 @@
 <script>
 import { mapGetters, mapMutations } from 'vuex'
   export default {
+    data() {
+      return {
+        zoom: null
+      }
+    },
     computed: {
       ...mapGetters({
-        restaurant: 'restaurants/getCurrentRestaurant'
+        restaurant: 'restaurants/getRestaurant'
       }),
       getTileLayerUrl() {
         const id = 'mapbox/streets-v11'
@@ -33,14 +38,14 @@ import { mapGetters, mapMutations } from 'vuex'
           return ["50.0755", "14.4378"] // Prague coordinates
         } else {
           this.zoom = 18;
-          return [this.restaurant.location.latitude, this.restaurant.location.longitude];
+          return [this.restaurant.restaurant.location.latitude, this.restaurant.restaurant.location.longitude];
         }
       },
       getAddress() {
         if (this.restaurant.custom) {
           return this.restaurant.location;
         } else {
-          return this.restaurant.location.address;
+          return this.restaurant.restaurant.location.address;
         }
       }
     },
@@ -51,8 +56,8 @@ import { mapGetters, mapMutations } from 'vuex'
 </script>
 
 <style lang="scss" scoped>
-  #map-wrap { 
-    height: 100%;  
+  #map-wrap {
+    height: 100%;
     width: 400px;
     position: absolute;
     right: 0;
@@ -87,7 +92,7 @@ import { mapGetters, mapMutations } from 'vuex'
     @media screen and (max-width: $tablet) {
       width: 100%;
     }
-  } 
+  }
   .geolocation-map__close {
     font-family: sans-serif;
     position: relative;

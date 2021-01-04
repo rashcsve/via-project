@@ -11,7 +11,7 @@
               <!-- Name -->
               <div class="form__box">
                 <label class="title--detail" for="name">
-                  Jméno restaurace
+                  Název restaurace
                 </label>
                 <input class="form-field" required name="name" id="name" v-model="restaurant.name" />
               </div>
@@ -30,7 +30,7 @@
                 <!-- TODO Make it required -->
                 <select v-model="restaurant.cuisines" class="form-field form-field__select">
                   <option disabled value="">Vyberte prosím</option>
-                  <option v-for="cuisine in Object.entries(cuisines)">{{ cuisine[1].translation }}</option>
+                  <option v-for="(cuisine, i) in Object.entries(cuisines)" :key="i">{{ cuisine[1].translation }}</option>
                 </select>
               </div>
               <!-- Price -->
@@ -41,7 +41,7 @@
                 <!-- TODO Make it required -->
                 <select v-model="restaurant.price_range" class="form-field form-field__select">
                   <option disabled value="">Vyberte prosím</option>
-                  <option v-for="option in 5">{{ option }}</option>
+                  <option v-for="(option, i) in 5" :key="i">{{ option }}</option>
                 </select>
               </div>
               <!-- Takeaway option -->
@@ -69,7 +69,7 @@
               <label class="title--detail" for="menu">
                 Denní menu
               </label>
-              <div class="form__box" v-for="dish in dishes">
+              <div class="form__box" v-for="(dish, i) in dishes" :key="i">
                 <input class="form-field" required placeholder="Jídlo" v-model="dish.name" />
                 <input class="form-field form-field--small" required placeholder="Cena" v-model="dish.price" />
                 <p class="form-label">Kč</p>
@@ -82,12 +82,12 @@
           <button class="button-link button-link--center" type="submit">
             Přidat restauraci
           </button>
-          <nuxt-link to="/" class="button-link button-link--back restaurants__button--location">Vrátit se na domovskou stránku</nuxt-link>
+          <nuxt-link to="/" class="button-link button-link--back restaurants__button--refresh">Vrátit se na domovskou stránku</nuxt-link>
         </form>
       </div>
       <div class="container__inner container--form container--added" v-else>
         <h2 class="title title--added">Menu této restaurace bylo úspěšně přidáno</h2>
-        <nuxt-link to="/" class="button-link button-link--center restaurants__button--restaurant">Vrátit se na domovskou stránku</nuxt-link>
+        <nuxt-link to="/" class="button-link button-link--center restaurants__button--refresh">Vrátit se na domovskou stránku</nuxt-link>
       </div>
     </div>
   </client-only>
@@ -132,31 +132,26 @@ export default {
       this.dishes.push(newDish);
     },
     async save() {
-      if (this.hasTakeaway) {
+      if (this.hasTakeaway && !this.restaurant.highlights.includes("Takeaway Available")) {
         this.restaurant.highlights.push("Takeaway Available");
       }
-      if (this.hasCreditCard) {
+      if (this.hasCreditCard && !this.restaurant.highlights.includes("Credit Card")) {
         this.restaurant.highlights.push("Credit Card");
       }
       this.restaurant.dishes = [...this.dishes];
-      const currentDate = new Date();
-      this.restaurant.date = currentDate.getFullYear()+'-'+(nowDate.getMonth()+1)+'-'+nowDate.getDate();
+      this.restaurant.date = new Date().toISOString().slice(0,10);
       try {
-        const response = await axios.post(
-          'http://localhost:5000/new',
+        const response = await this.$axios.$post(
+          'new',
           { "restaurant": { ...this.restaurant } },
           { headers: { 'Content-Type': 'application/json' } }
         )
         this.wasAdded = true;
         console.log(response);
         this.restaurantId = response.data;
-        this.addToLocalStorage();
       } catch (error) {
         console.log(error)
       }
-    },
-    addToLocalStorage() {
-      localStorage.setItem('restaurant', this.restaurantId )
     }
   }
 }

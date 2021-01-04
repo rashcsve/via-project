@@ -53,7 +53,7 @@ export default {
         return dish.dish.price
       }
        if (this.isCustom && dish.price) {
-        return dish.price;
+        return dish.price + " Kč"
       }
       return ""
     }

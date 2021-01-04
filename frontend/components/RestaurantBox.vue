@@ -11,7 +11,7 @@
       <p class="restaurant-box__location">{{ getLocation }}</p>
     </div>
     <div class="restaurant-box__right">
-      <p>Více informace</p>
+      <p>Více informací</p>
     </div>
   </nuxt-link>
 </template>

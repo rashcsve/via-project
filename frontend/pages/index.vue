@@ -16,7 +16,7 @@
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex'
+import { mapActions, mapGetters } from 'vuex'
 import RestaurantBox from '~/components/RestaurantBox'
 import Loading from '~/components/Loading'
 
@@ -35,6 +35,7 @@ export default {
   async created() {
     try {
       this.gettingRestaurants = true
+      await this.loadRestaurants()
       this.restaurants = await this.getRestaurants
       this.gettingRestaurants = false
     } catch (e) {
@@ -49,6 +50,11 @@ export default {
     getDate() {
       return new Date().toLocaleDateString()
     }
+  },
+  methods: {
+    ...mapActions({
+      loadRestaurants: 'restaurants/getRestaurants'
+    })
   }
 }
 </script>

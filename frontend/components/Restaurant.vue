@@ -2,10 +2,11 @@
   <Loading v-if="loading" color />
   <div v-else-if="!loading && !error" class="restaurant">
     <h2 class="title">
-      <span>{{citation}}</span>
-      <a :href="restaurant.url" target="_blank" class="title--link">
-        {{ restaurant.name }}
+      <span>{{ citation }}</span>
+      <a v-if="restaurant.restaurant && restaurant.restaurant.url" :href="restaurant.restaurant.url" target="_blank" class="title--link">
+        {{ restaurant.restaurant.name }}
       </a>
+      <p class="title--link" v-else>{{ restaurant.name }}</p>
     </h2>
     <div class="restaurant__info">
       <div class="restaurant__details">
@@ -25,7 +26,7 @@
         <div class="restaurant__detail">
           <h3 class="title--detail">Jídlo s sebou:</h3>
           <span
-            v-if="hasTakeAway(restaurant.highlights)"
+            v-if="takeAway"
             >👍
           </span>
           <span v-else>👎</span>
@@ -34,33 +35,30 @@
         <div class="restaurant__detail">
           <h3 class="title--detail">Platba kartou:</h3>
           <span
-            v-if="hasCreditCard(restaurant.highlights)"
+            v-if="creditCard"
             >👍
           </span>
           <span v-else>👎</span>
         </div>
       </div>
       <div class="restaurant__menu">
-        <!-- Daily Menu -->
-        <DailyMenu v-if="isDailyMenu" :dishes="dailyMenuDishes" />
-        <Loading v-else color />
+        <DailyMenu :dishes="dailyMenuDishes" />
       </div>
     </div>
     <div class="restaurants__buttons">
-      <button @click="refreshDailyMenu(false)" class="restaurants__button--refresh">Chci další!</button>
       <button @click="showLocationMap" class="restaurants__button--location">Kde to je?</button>
-      <nuxt-link to="/add-menu" class="button-link button-link--center restaurants__button--restaurant">Přidat denní menu</nuxt-link>
+      <nuxt-link to="/" class="button-link restaurants__button--refresh">Vrátit se na domovskou stránku!</nuxt-link>
     </div>
   </div>
   <div v-else-if="error" class="title--added">
-    Není žádné menu :/
+    {{ error }}
   </div>
 </template>
 
 <script>
 import DailyMenu from '~/components/DailyMenu'
 import Loading from '~/components/Loading'
-import { mapGetters, mapActions, mapMutations } from 'vuex'
+import { mapGetters, mapMutations } from 'vuex'
 
 import { emojiParse } from '../middleware/emojiParse'
 import { getCitation } from '../static/citations'
@@ -75,80 +73,76 @@ export default {
       loading: false,
       citation: null,
       hasMenu: false,
-      starSize: 16,
-      error: false
+      error: false,
+      restaurant: null
     }
   },
-  // Load nearby restaurants by location and get a random restaurant with the daily menu
   async created() {
     try {
       this.loading = true
-      await this.getNearbyRestaurants()
-      await this.refreshDailyMenu(true)
+      this.citation = getCitation()
+      const id = this.$route.params.slug
+      await this.$store.dispatch('restaurants/getRestaurant', id)
+      this.restaurant = await this.getCurrentRestaurant
+      console.log(this.restaurant)
+      this.loading = false
     } catch (e) {
       console.log(e)
+      this.loading = false
+      this.error = "Nejde načíst restauraci :("
     }
   },
   computed: {
     ...mapGetters({
-      dailyMenuDishes: 'restaurants/getDailyMenuDishes',
-      isDailyMenu: 'restaurants/getDailyMenuStatus',
-      restaurant: 'restaurants/getCurrentRestaurant',
       showLocation: 'currentRestaurant/getShowLocation',
-      restaurants: 'restaurants/getRestaurants'
+      getCurrentRestaurant: 'restaurants/getRestaurant'
     }),
     parsePrice() {
-      return "💸".repeat(this.restaurant.price_range)
+      if (this.isCustom) {
+        return "💸".repeat(this.restaurant.price_range)
+      } else {
+        return "💸".repeat(this.restaurant.restaurant.price_range)
+      }
     },
     parseCuisine() {
-      return emojiParse(this.restaurant.cuisines)
+      if (this.isCustom) {
+        return emojiParse(this.restaurant.cuisines)
+      } else {
+        return emojiParse(this.restaurant.restaurant.cuisines)
+      }
     },
-    parseRating() {
-      return this.restaurant.user_rating.aggregate_rating * 100 / 5
+    dailyMenuDishes() {
+      if (this.restaurant.custom) {
+        return this.restaurant.dishes
+      } else {
+        return this.restaurant.daily_menus[0].daily_menu.dishes
+      }
+    },
+    isCustom() {
+      return this.restaurant.custom
+    },
+    creditCard() {
+      if (this.isCustom) {
+        return this.hasCreditCard(this.restaurant.highlights)
+      } else {
+        return this.hasCreditCard(this.restaurant.restaurant.highlights)
+      }
+    },
+    takeAway() {
+      if (this.isCustom) {
+        return this.hasTakeAway(this.restaurant.highlights)
+      } else {
+        return this.hasTakeAway(this.restaurant.restaurant.highlights)
+      }
     }
   },
   methods: {
     ...mapMutations({setShowLocation: 'currentRestaurant/setShowLocation'}),
-    ...mapActions({
-      getNearbyRestaurants: 'restaurants/getNearbyRestaurants',
-      getRandomRestaurant: 'restaurants/getRandomRestaurant',
-      getDailyMenu: 'restaurants/getDailyMenu',
-      setDishes: 'restaurants/setDishes'
-    }),
     hasCreditCard(highlights) {
       return highlights.includes("Credit Card");
     },
     hasTakeAway(highlights) {
       return highlights.includes("Takeaway Available");
-    },
-    hasPetFriendly(highlights) {
-      return highlights.includes("Pet Friendly");
-    },
-    async refreshDailyMenu(readLocalStorage) {
-      try {
-        this.loading = true
-        this.closeLocationMap()
-        this.citation = getCitation()
-        while(!this.hasMenu) {
-          await this.getRandomRestaurant(readLocalStorage)
-          if (this.restaurant.custom && readLocalStorage) {
-            this.setDishes(this.restaurant.dishes)
-            this.hasMenu = true;
-          } else {
-            await this.getDailyMenu()
-            this.hasMenu = this.isDailyMenu
-            if (this.restaurants.length < 5) {
-              await this.getNearbyRestaurants()
-            }
-          }
-        }
-        this.loading = false
-        this.hasMenu = false
-      } catch (e) {
-        console.log(e)
-        this.loading = false
-        this.error = true;
-      }
     },
     showLocationMap() {
       this.setShowLocation(!this.showLocation)

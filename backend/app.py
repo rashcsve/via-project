@@ -46,8 +46,10 @@ def restaurants():
     dbItems = db.restaurants.find()
     dbRestaurants = [items for items in dbItems]
     for rest in dbRestaurants:
+        print(rest['name'])
         restDate = rest['date']
         restDateConverted = datetime.strptime(restDate, DATE_FORMAT)
+        print(restDate)
         if (restDate == CURRENT_DATE):
             data.insert(0, rest)
     return JSONEncoder().encode(data)
@@ -62,6 +64,8 @@ def new():
 @flask.route("/api/id/<_id>", methods=["GET"])
 def getId(_id):
     restaurant = db.restaurants.find_one({"_id": ObjectId(_id)})
+    if not restaurant:
+        restaurant = restaurantsCollection.find_one({"_id": ObjectId(_id)})
     return json.dumps(restaurant, default=json_util.default)
 
 
