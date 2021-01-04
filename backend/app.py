@@ -16,6 +16,8 @@ CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
 client = MongoClient(
     "mongodb+srv://user:useruser@via.eforv.mongodb.net/via?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
 )
+mongoRestaurants = client.restaurants
+restaurantsCollection = mongoRestaurants.data
 db = client.menus
 
 
@@ -28,13 +30,16 @@ class JSONEncoder(json.JSONEncoder):
 
 @flask.route("/api/restaurants", methods=["GET"])
 def restaurants():
-    restaurants = getNearestRestaurants()
-    data = getDailyMenus(restaurants)
+    # restaurants = getNearestRestaurants()
+    # data = getDailyMenus(restaurants)
+    # restaurantsCollection.insert(data)
+    data = [items for items in restaurantsCollection.find()]
 
     dbItems = db.restaurants.find()
     dbRestaurants = [items for items in dbItems]
-    data.insert(0, JSONEncoder().encode(dbRestaurants))
-    return json.dumps(data)
+    for rest in dbRestaurants:
+        data.insert(0, rest)
+    return JSONEncoder().encode(data)
 
 
 @flask.route("/api/new", methods=["POST"])

@@ -1,7 +1,7 @@
 import geocoder
 import requests
 
-ZOMATO_API_KEY = "cbd3a114b35a5ae4bd5232a54a7e6e88"
+ZOMATO_API_KEY = "abc9df7f5ea8705f0248f9ee2712d14a"
 
 HEADERS = {
     "Accept": "application/json",
@@ -18,7 +18,7 @@ def getNearestRestaurants():
     data = []
     offset = 0
 
-    while offset < 100:
+    while offset < 200:
         params = (("lat", LAT), ("lon", LNG), ("start", offset))
         response = requests.get(
             "https://developers.zomato.com/api/v2.1/search",
