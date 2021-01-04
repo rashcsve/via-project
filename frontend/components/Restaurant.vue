@@ -84,6 +84,8 @@ export default {
       const id = this.$route.params.slug
       await this.$store.dispatch('restaurants/getRestaurant', id)
       this.restaurant = await this.getCurrentRestaurant
+      this.restaurant = JSON.parse(this.restaurant)
+      console.log(typeof this.restaurant)
       console.log(this.restaurant)
       this.loading = false
     } catch (e) {

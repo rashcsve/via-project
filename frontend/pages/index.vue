@@ -37,6 +37,7 @@ export default {
       this.gettingRestaurants = true
       await this.loadRestaurants()
       this.restaurants = await this.getRestaurants
+      this.restaurants = JSON.parse(this.restaurants)
       this.gettingRestaurants = false
     } catch (e) {
       console.log(e)
