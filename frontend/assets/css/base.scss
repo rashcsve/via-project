@@ -219,6 +219,11 @@ button,
 .restaurants__buttons {
   display: flex;
   margin-top: 10px;
+
+  &--index {
+    margin: auto;
+    margin-bottom: 16px;
+  }
   @media screen and (max-width: $tablet) {
     flex-flow: column;
   }
