@@ -4,7 +4,8 @@ from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
 from bson import ObjectId, json_util
 from flask_cors import CORS
-from restaurants import getNearestRestaurants, getDailyMenus
+from datetime import datetime
+from restaurants import getRestaurants
 
 flask = Flask(__name__)
 CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
@@ -20,6 +21,9 @@ mongoRestaurants = client.restaurants
 restaurantsCollection = mongoRestaurants.data
 db = client.menus
 
+DATE_FORMAT = '%Y-%m-%d'
+CURRENT_DATE = datetime.now().date().strftime(DATE_FORMAT)
+
 
 class JSONEncoder(json.JSONEncoder):
     def default(self, o):
@@ -30,15 +34,22 @@ class JSONEncoder(json.JSONEncoder):
 
 @flask.route("/api/restaurants", methods=["GET"])
 def restaurants():
-    # restaurants = getNearestRestaurants()
-    # data = getDailyMenus(restaurants)
-    # restaurantsCollection.insert(data)
-    data = [items for items in restaurantsCollection.find()]
+    if (restaurantsCollection.count() == 0):
+        data = getRestaurants(restaurantsCollection)
+    else:
+        data = [items for items in restaurantsCollection.find()]
+        firstObjDate = data[0]['date']
+        if (firstObjDate != CURRENT_DATE):
+            restaurantsCollection.drop()
+            data = getRestaurants(restaurantsCollection)
 
     dbItems = db.restaurants.find()
     dbRestaurants = [items for items in dbItems]
     for rest in dbRestaurants:
-        data.insert(0, rest)
+        restDate = rest['date']
+        restDateConverted = datetime.strptime(restDate, DATE_FORMAT)
+        if (restDate == CURRENT_DATE):
+            data.insert(0, rest)
     return JSONEncoder().encode(data)
 
 

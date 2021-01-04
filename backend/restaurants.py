@@ -1,7 +1,9 @@
 import geocoder
 import requests
+from datetime import datetime
 
 ZOMATO_API_KEY = "abc9df7f5ea8705f0248f9ee2712d14a"
+DATE_FORMAT = '%Y-%m-%d'
 
 HEADERS = {
     "Accept": "application/json",
@@ -18,7 +20,7 @@ def getNearestRestaurants():
     data = []
     offset = 0
 
-    while offset < 200:
+    while offset < 20:
         params = (("lat", LAT), ("lon", LNG), ("start", offset))
         response = requests.get(
             "https://developers.zomato.com/api/v2.1/search",
@@ -55,3 +57,12 @@ def getDailyMenu(restaurant):
         params={"res_id": int(id)},
     )
     return response
+
+
+def getRestaurants(collection):
+    restaurants = getNearestRestaurants()
+    data = getDailyMenus(restaurants)
+    for rest in data:
+        rest["date"] = datetime.now().date().strftime(DATE_FORMAT)
+    collection.insert(data)
+    return data

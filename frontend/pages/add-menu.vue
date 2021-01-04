@@ -139,7 +139,8 @@ export default {
         this.restaurant.highlights.push("Credit Card");
       }
       this.restaurant.dishes = [...this.dishes];
-      this.restaurant.date = new Date();
+      const currentDate = new Date();
+      this.restaurant.date = currentDate.getFullYear()+'-'+(nowDate.getMonth()+1)+'-'+nowDate.getDate();
       try {
         const response = await axios.post(
           'http://localhost:5000/new',
