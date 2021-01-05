@@ -5,7 +5,6 @@ from pymongo import MongoClient
 from bson import ObjectId, json_util
 from flask_cors import CORS
 from datetime import datetime
-from flask_swagger_ui import get_swaggerui_blueprint
 from flask_restplus import Api, Resource
 from restaurants import getRestaurants
 
@@ -92,4 +91,4 @@ class Restaurant(Resource):
 
 
 if __name__ == "__main__":
-    flask.run(host="0.0.0.0", debug=True)
+    flask.run()
