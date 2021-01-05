@@ -12,15 +12,16 @@ HEADERS = {
 
 g = geocoder.ip("me")
 latlng = g.latlng
-LAT = latlng[0]
-LNG = latlng[-1]
+LAT = "50.0755"
+LNG = "14.4378"
 
 
 def getNearestRestaurants():
     data = []
     offset = 0
+    print(latlng)
 
-    while offset < 50:
+    while offset < 20:
         params = (("lat", LAT), ("lon", LNG), ("start", offset))
         response = requests.get(
             "https://developers.zomato.com/api/v2.1/search",
@@ -52,6 +53,7 @@ def getDailyMenus(restaurants):
 
 def getDailyMenu(restaurant):
     id = restaurant["restaurant"]["id"]
+    print(id)
     response = requests.get(
         "https://developers.zomato.com/api/v2.1/dailymenu",
         headers=HEADERS,
