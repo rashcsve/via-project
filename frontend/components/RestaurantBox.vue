@@ -59,7 +59,7 @@ import { emojiParse } from '../middleware/emojiParse'
 <style lang="scss" scoped>
 .restaurant-box {
   width: 80%;
-  margin: auto;
+  margin: 0 auto;
   box-shadow: 2px 2px 6px 0px rgba(93,54,186,0.54);
   border: 1px solid $color-violet;
   margin-bottom: 8px;

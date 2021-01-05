@@ -20,12 +20,16 @@ import { mapGetters, mapMutations } from 'vuex'
   export default {
     data() {
       return {
-        zoom: null
+        zoom: null,
+        restaurant: null
       }
+    },
+    created() {
+      this.restaurant = JSON.parse(this.getRestaurant)
     },
     computed: {
       ...mapGetters({
-        restaurant: 'restaurants/getRestaurant'
+        getRestaurant: 'restaurants/getRestaurant'
       }),
       getTileLayerUrl() {
         const id = 'mapbox/streets-v11'

@@ -3,7 +3,7 @@ from glob import glob
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
 from bson import ObjectId, json_util
-# from flask_cors import CORS
+from flask_cors import CORS
 from datetime import datetime
 from flask_restplus import Api, Resource
 from restaurants import getRestaurants
@@ -16,7 +16,7 @@ flask_app = Api(
     description=
     "A simple SPA application for showing lunch menus of selected restaurants built on REST API."
 )
-# CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
+CORS(app, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 client = MongoClient(
     "mongodb+srv://user:useruser@via.eforv.mongodb.net/via?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
@@ -77,6 +77,7 @@ class AddNew(Resource):
     },
                    description="Create new restaurant")
     def post(self):
+        print(request.json())
         result = db.restaurants.insert_one(request.json["restaurant"])
         return str(result.inserted_id)
 

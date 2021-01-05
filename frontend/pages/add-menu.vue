@@ -144,10 +144,15 @@ export default {
         const response = await this.$axios.$post(
           'new',
           { "restaurant": { ...this.restaurant } },
-          { headers: { 'Content-Type': 'application/json' } }
+          { headers:
+            {
+              'Content-Type': 'application/json',
+              "Access-Control-Allow-Origin": "*"
+            }
+          }
         )
+        console.log(this.response)
         this.wasAdded = true;
-        console.log(response);
         this.restaurantId = response.data;
       } catch (error) {
         console.log(error)

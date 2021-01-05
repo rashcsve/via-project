@@ -2,7 +2,7 @@
   <client-only>
     <div class="container">
       <div class="container__inner container__index">
-        <h2 class="title title--added">Denní Menu v tvém okolí</h2>
+        <h2 class="title title--added">Denní Menu v Praze</h2>
         <h3 class="date">{{ getDate }}</h3>
         <div class="restaurants__buttons restaurants__buttons--index">
           <nuxt-link to="/add-menu" class="button-link button-link--center restaurants__button--restaurant">Přidat denní menu</nuxt-link>
@@ -63,5 +63,6 @@ export default {
 <style lang="scss">
 .date {
   margin-bottom: 24px;
+  margin-top: 0;
 }
 </style>
