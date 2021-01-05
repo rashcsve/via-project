@@ -3,20 +3,20 @@ from glob import glob
 from flask import Flask, redirect, url_for, request, render_template, jsonify
 from pymongo import MongoClient
 from bson import ObjectId, json_util
-from flask_cors import CORS
+# from flask_cors import CORS
 from datetime import datetime
 from flask_restplus import Api, Resource
 from restaurants import getRestaurants
 
-flask = Flask(__name__)
-app = Api(
-    app=flask,
+app = Flask(__name__)
+flask_app = Api(
+    app=app,
     version="1.0",
     title="Daily Menu VIA App",
     description=
     "A simple SPA application for showing lunch menus of selected restaurants built on REST API."
 )
-CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
+# CORS(flask, resources={r"/*": {"origins": "http://localhost:3000"}})
 
 client = MongoClient(
     "mongodb+srv://user:useruser@via.eforv.mongodb.net/via?retryWrites=true&w=majority&ssl=true&ssl_cert_reqs=CERT_NONE"
@@ -37,15 +37,17 @@ class JSONEncoder(json.JSONEncoder):
 
 
 """Define namespace"""
-restaurants_name_space = app.namespace(
+restaurants_name_space = flask_app.namespace(
     "api", description='Get info about restaurants')
 
 
 @restaurants_name_space.route("/restaurants")  # Define the route
 class RestaurantsList(Resource):
-    @app.doc(responses={200: 'OK'}, description="Get list of all restaurants"
-             )  # Documentation of route
+    @flask_app.doc(responses={200: 'OK'},
+                   description="Get list of all restaurants"
+                   )  # Documentation of route
     def get(self):  # GET method of REST
+        data = []
         if (restaurantsCollection.count() == 0):
             data = getRestaurants(restaurantsCollection)
         else:
@@ -69,11 +71,11 @@ class RestaurantsList(Resource):
 
 @restaurants_name_space.route("/new")  # Define the route
 class AddNew(Resource):
-    @app.doc(responses={
+    @flask_app.doc(responses={
         200: 'OK',
         400: 'Invalid Argument'
     },
-             description="Create new restaurant")
+                   description="Create new restaurant")
     def post(self):
         result = db.restaurants.insert_one(request.json["restaurant"])
         return str(result.inserted_id)
@@ -81,14 +83,10 @@ class AddNew(Resource):
 
 @restaurants_name_space.route("/id/<_id>")  # Define the route
 class Restaurant(Resource):
-    @app.doc(responses={200: 'OK'},
-             description="Get the restaurant")  # Documentation of route
+    @flask_app.doc(responses={200: 'OK'},
+                   description="Get the restaurant")  # Documentation of route
     def get(self, _id):  # GET method of REST
         restaurant = db.restaurants.find_one({"_id": ObjectId(_id)})
         if not restaurant:
             restaurant = restaurantsCollection.find_one({"_id": ObjectId(_id)})
         return json.dumps(restaurant, default=json_util.default)
-
-
-if __name__ == "__main__":
-    flask.run()

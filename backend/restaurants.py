@@ -20,7 +20,7 @@ def getNearestRestaurants():
     data = []
     offset = 0
 
-    while offset < 20:
+    while offset < 50:
         params = (("lat", LAT), ("lon", LNG), ("start", offset))
         response = requests.get(
             "https://developers.zomato.com/api/v2.1/search",
@@ -41,6 +41,7 @@ def getDailyMenus(restaurants):
     for rest in restaurants:
         result = getDailyMenu(rest)
         menu = result.json()
+        print(menu)
         currentRestaurant = dict(rest)
         if result.status_code == 200 and menu["daily_menus"]:
             currentRestaurant.update(menu)
@@ -62,7 +63,9 @@ def getDailyMenu(restaurant):
 def getRestaurants(collection):
     restaurants = getNearestRestaurants()
     data = getDailyMenus(restaurants)
+    print("DailyMenus")
+    print(data)
     for rest in data:
         rest["date"] = datetime.now().date().strftime(DATE_FORMAT)
-    collection.insert(data)
+        collection.insert_one(rest)
     return data
