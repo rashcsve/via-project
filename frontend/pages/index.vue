@@ -1,69 +1,74 @@
 <template>
   <client-only>
     <div class="container">
-      <div :class="{'container__inner':true, 'container__inner--open': showLocation}">
-        <Loading v-if="gettingLocation" color />
-        <div v-if="locationError" class="container__error">
-          Oops, nemohu zjistit tvoji geolokaci, abys používal appku :( Povol to, prosím
+      <div class="container__inner container__index">
+        <h2 class="title title--added">Denní Menu v Praze</h2>
+        <h3 class="date">{{ getDate }}</h3>
+        <div class="restaurants__buttons restaurants__buttons--index">
+          <nuxt-link to="/add-menu" class="button-link button-link--center restaurants__button--restaurant">Přidat denní menu</nuxt-link>
         </div>
-        <restaurant v-if="location" />
-      </div>
-      <!-- Map Sidebar -->
-      <div v-if="showLocation" class="container__geolocation-wrap">
-        <geolocation-map />
+        <Loading v-if="gettingRestaurants" color />
+        <p v-if="error" class="date">{{ error }}</p>
+        <restaurant-box v-else v-for="(rest, i) in restaurants" :key="i" :data="rest" />
+        <div class="restaurants__buttons restaurants__buttons--index">
+          <nuxt-link to="/docs" class="button-link button-link--center restaurants__button--restaurant">
+            Dokumentace
+          </nuxt-link>
+        </div>
       </div>
     </div>
   </client-only>
 </template>
 
 <script>
-import { mapMutations, mapGetters } from 'vuex'
-import GeolocationMap from '~/components/GeolocationMap'
-import Restaurant from '~/components/Restaurant'
+import { mapActions, mapGetters } from 'vuex'
+import RestaurantBox from '~/components/RestaurantBox'
 import Loading from '~/components/Loading'
 
 export default {
   components: {
-    GeolocationMap,
-    Restaurant,
+    RestaurantBox,
     Loading
   },
   data(){
     return {
-      location: null,
-      gettingLocation: false,
-      locationError: null
+      gettingRestaurants: false,
+      restaurants: null,
+      error: null
     }
   },
   async created() {
-    // Do we support geolocation
-    if (process.client) {
-      this.gettingLocation = true;
-      if(!("geolocation" in navigator)) {
-        this.locationError = 'Geolocation is not available.';
-        this.gettingLocation = false;
-        return;
-      }
-      let position = await this.getPosition();
-      this.setLocation(position.coords)
-      this.location = position;
-      this.gettingLocation = false;
+    try {
+      this.gettingRestaurants = true
+      await this.loadRestaurants()
+      this.restaurants = await this.getRestaurants
+      this.restaurants = JSON.parse(this.restaurants)
+      this.gettingRestaurants = false
+    } catch (e) {
+      console.log(e)
+      this.gettingRestaurants = false
+      this.error = "Nemůžu najít žádné menu. Hm, zkus později"
     }
   },
   computed: {
     ...mapGetters({
-      showLocation: 'currentRestaurant/getShowLocation'
-    })
+      getRestaurants: 'restaurants/getRestaurants'
+    }),
+    getDate() {
+      return new Date().toLocaleDateString()
+    }
   },
   methods: {
-    ...mapMutations({
-      setLocation: 'location/setLocation'
-    }),
-    getPosition() {
-      return new Promise((res, rej) => {
-        navigator.geolocation.getCurrentPosition(res, rej);
-      });
-    }
+    ...mapActions({
+      loadRestaurants: 'restaurants/getRestaurants'
+    })
   }
 }
 </script>
+
+<style lang="scss">
+.date {
+  margin-bottom: 24px;
+  margin-top: 0;
+}
+</style>
