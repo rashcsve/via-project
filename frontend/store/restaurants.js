@@ -23,11 +23,11 @@ export const mutations = {
 
 export const actions = {
   async getRestaurants({commit}) {
-    const data = await this.$axios.$get('restaurants')
+    const data = await this.$axios.$get('restaurant/all')
     commit('setRestaurants', data)
   },
   async getRestaurant({commit}, id) {
-    const data = await this.$axios.$get(`id/${id}`)
+    const data = await this.$axios.$get(`restaurant/id/${id}`)
     commit('setRestaurant', data)
   }
 }

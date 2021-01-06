@@ -236,7 +236,7 @@ export default {
   }
 }
 .restaurants__button--refresh {
-  background-color: $color-red;
+  background-color: $color-violet;
   &::before {
     content: "\01F504";
     position: relative;

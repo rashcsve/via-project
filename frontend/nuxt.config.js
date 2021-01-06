@@ -60,7 +60,7 @@ export default {
    ** See https://axios.nuxtjs.org/options
    */
   axios: {
-    baseURL:  process.env.BASE_URL || 'https://daily-menu-backend.herokuapp.com/api/',
+    baseURL:  process.env.BASE_URL || 'https://daily-menu-backend.herokuapp.com/',
     headers: {
       Accept: 'application/json'
     }

@@ -1,12 +1,15 @@
 <template>
   <div class="geolocation-map" @click="setShowLocation(false)">
-    <div id="map-wrap">
+    <div id="map-wrap" v-if="!loading">
       <client-only>
         <l-map :zoom="zoom" :center="getLatLng">
           <l-tile-layer :url="getTileLayerUrl"></l-tile-layer>
           <l-marker :lat-lng="getLatLng"></l-marker>
         </l-map>
       </client-only>
+    </div>
+    <div id="map-wrap" class="geolocation-map__loading" v-else>
+      <Loading color />
     </div>
     <div class="geolocation-map__info" @click="setShowLocation(false)">
       <h3>{{ getAddress }}</h3>
@@ -16,16 +19,28 @@
 </template>
 
 <script>
+import Loading from "./Loading"
 import { mapGetters, mapMutations } from 'vuex'
   export default {
+    components: {
+      Loading
+    },
     data() {
       return {
-        zoom: null,
-        restaurant: null
+        zoom: 18,
+        restaurant: null,
+        latlng: [],
+        loading: false
       }
     },
-    created() {
+    async created() {
       this.restaurant = JSON.parse(this.getRestaurant)
+      if (this.restaurant.custom) {
+          this.loading = true;
+          this.latlng = await this.$store.dispatch('location/getLocation', this.restaurant.location)
+          this.latlng = JSON.parse(this.latlng)
+          this.loading = false;
+      }
     },
     computed: {
       ...mapGetters({
@@ -38,10 +53,8 @@ import { mapGetters, mapMutations } from 'vuex'
       },
       getLatLng() {
         if (this.restaurant.custom) {
-          this.zoom = 12;
-          return ["50.0755", "14.4378"] // Prague coordinates
+          return this.latlng
         } else {
-          this.zoom = 18;
           return [this.restaurant.restaurant.location.latitude, this.restaurant.restaurant.location.longitude];
         }
       },
@@ -54,7 +67,7 @@ import { mapGetters, mapMutations } from 'vuex'
       }
     },
     methods:{
-      ...mapMutations({setShowLocation: 'currentRestaurant/setShowLocation'}),
+      ...mapMutations({setShowLocation: 'currentRestaurant/setShowLocation'})
     }
   }
 </script>
@@ -102,5 +115,8 @@ import { mapGetters, mapMutations } from 'vuex'
     position: relative;
     top: -32px;
     height: 24px;
+  }
+  .geolocation-map__loading {
+    background-color: $color-white;
   }
 </style>

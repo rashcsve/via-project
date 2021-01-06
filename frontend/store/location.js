@@ -17,3 +17,10 @@ export const mutations = {
     state.location.longitude = payload.longitude;
   }
 }
+
+export const actions = {
+  async getLocation({commit}, address) {
+    const data = await this.$axios.$get(`geolocation/${address}`)
+    return data
+  }
+}

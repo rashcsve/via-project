@@ -154,7 +154,7 @@ export default {
       this.restaurant.date = new Date().toISOString().slice(0,10);
       try {
         const response = await this.$axios.post(
-          'new',
+          'restaurant/new',
           { "restaurant": { ...this.restaurant } },
           { headers:
             {
