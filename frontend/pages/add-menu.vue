@@ -30,7 +30,9 @@
                 <!-- TODO Make it required -->
                 <select v-model="restaurant.cuisines" class="form-field form-field__select">
                   <option disabled value="">Vyberte prosím</option>
-                  <option v-for="(cuisine, i) in Object.entries(cuisines)" :key="i">{{ cuisine[1].translation }}</option>
+                  <option v-for="(cuisine, i) in Object.entries(cuisines)" :key="i" :value="cuisine[1].name">
+                    {{ cuisine[1].translation }}
+                  </option>
                 </select>
               </div>
               <!-- Price -->
@@ -49,9 +51,9 @@
                 <label class="title--detail" for="takeaway">
                   Jídlo s sebou
                 </label>
-                <input type="radio" id="takeaway-yes" value="takeaway-yes" v-model="hasTakeaway">
+                <input type="radio" id="takeaway-yes" :value="true" v-model="hasTakeAway">
                 <label class="radio-label" for="takeaway-yes">Ano</label>
-                <input type="radio" id="takeaway-no" value="takeaway-no" v-model="hasTakeaway">
+                <input type="radio" id="takeaway-no" :value="false" v-model="hasTakeAway">
                 <label class="radio-label" for="takeaway-no">Ne</label>
               </div>
               <!-- Pay with card option -->
@@ -59,9 +61,9 @@
                 <label class="title--detail" for="card">
                   Platba kartou
                 </label>
-                <input type="radio" id="card-yes" value="card-yes" v-model="hasCreditCard">
+                <input type="radio" id="card-yes" :value="true" v-model="hasCreditCard">
                 <label class="radio-label" for="card-yes">Ano</label>
-                <input type="radio" id="card-no" value="card-no" v-model="hasCreditCard">
+                <input type="radio" id="card-no" :value="false" v-model="hasCreditCard">
                 <label class="radio-label" for="card-no">Ne</label>
               </div>
             </div>
@@ -79,8 +81,10 @@
               </div>
             </div>
           </div>
+          <p v-if="error">{{ error }}</p>
           <button class="button-link button-link--center" type="submit">
-            Přidat restauraci
+            <span v-if="!saving">Přidat restauraci</span>
+            <Loading v-if="saving" color class="no-cursor" />
           </button>
           <nuxt-link to="/" class="button-link button-link--back restaurants__button--refresh">Vrátit se na domovskou stránku</nuxt-link>
         </form>
@@ -94,17 +98,23 @@
 </template>
 
 <script>
+import Loading from "../components/Loading"
 import axios from 'axios'
 import { cuisines } from "../static/cuisines"
 
 export default {
+  components: {
+    Loading
+  },
   data(){
     return {
       wasAdded: false,
+      saving: false,
       restaurantId: "",
-      hasTakeaway: false,
+      hasTakeAway: null,
+      error: null,
       cuisines: cuisines,
-      hasCreditCard: false,
+      hasCreditCard: null,
       dishes: [
         {
           name: "",
@@ -132,7 +142,9 @@ export default {
       this.dishes.push(newDish);
     },
     async save() {
-      if (this.hasTakeaway && !this.restaurant.highlights.includes("Takeaway Available")) {
+      this.saving = true;
+      this.error = "";
+      if (this.hasTakeAway && !this.restaurant.highlights.includes("Takeaway Available")) {
         this.restaurant.highlights.push("Takeaway Available");
       }
       if (this.hasCreditCard && !this.restaurant.highlights.includes("Credit Card")) {
@@ -150,13 +162,19 @@ export default {
             }
           }
         )
-        console.log(this.response)
         this.wasAdded = true;
         this.restaurantId = response.data;
+        this.saving = false;
       } catch (error) {
-        console.log(error)
+        this.saving = false;
+        this.error = "Nemůžu uložit menu :( Zkus znovu!"
       }
     }
   }
 }
 </script>
+<style lang="scss" scoped>
+.no-cursor {
+  cursor: not-allowed;
+}
+</style>

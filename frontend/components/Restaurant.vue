@@ -6,7 +6,7 @@
       <a v-if="restaurant.restaurant && restaurant.restaurant.url" :href="restaurant.restaurant.url" target="_blank" class="title--link">
         {{ restaurant.restaurant.name }}
       </a>
-      <p class="title--link" v-else>{{ restaurant.name }}</p>
+      <span class="title--link" v-else>{{ restaurant.name }}</span>
     </h2>
     <div class="restaurant__info">
       <div class="restaurant__details">

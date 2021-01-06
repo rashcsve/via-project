@@ -8,7 +8,7 @@
           <nuxt-link to="/add-menu" class="button-link button-link--center restaurants__button--restaurant">Přidat denní menu</nuxt-link>
         </div>
         <Loading v-if="gettingRestaurants" color />
-        <p v-if="error">{{ error }}</p>
+        <p v-if="error" class="date">{{ error }}</p>
         <restaurant-box v-else v-for="(rest, i) in restaurants" :key="i" :data="rest" />
       </div>
     </div>
@@ -41,6 +41,7 @@ export default {
       this.gettingRestaurants = false
     } catch (e) {
       console.log(e)
+      this.gettingRestaurants = false
       this.error = "Nemůžu najít žádné menu. Hm, zkus později"
     }
   },
