@@ -55,28 +55,34 @@ geolocation_name_space = flask_app.namespace("geolocation",
 
 @restaurants_name_space.route("/all")  # Define the route
 class RestaurantsList(Resource):
-    @flask_app.doc(responses={200: 'OK'},
+    @flask_app.doc(responses={
+        200: 'OK',
+        400: 'Bad Request'
+    },
                    description="Get list of all restaurants"
                    )  # Documentation of route
     def get(self):  # GET method of REST
-        data = []
-        if (restaurants.count() == 0):
-            data = getRestaurants(restaurants)
-        else:
-            data = [items for items in restaurants.find()]
-            firstObjDate = data[0]['date']
-            if (firstObjDate != CURRENT_DATE):
-                restaurants.drop()
+        try:
+            data = []
+            if (restaurants.count() == 0):
                 data = getRestaurants(restaurants)
+            else:
+                data = [items for items in restaurants.find()]
+                firstObjDate = data[0]['date']
+                if (firstObjDate != CURRENT_DATE):
+                    restaurants.drop()
+                    data = getRestaurants(restaurants)
 
-        dbItems = db.custom.find()
-        dbRestaurants = [items for items in dbItems]
-        for rest in dbRestaurants:
-            restDate = rest['date']
-            restDateConverted = datetime.strptime(restDate, DATE_FORMAT)
-            if (restDate == CURRENT_DATE):
-                data.insert(0, rest)
-        return JSONEncoder().encode(data)
+            dbItems = db.custom.find()
+            dbRestaurants = [items for items in dbItems]
+            for rest in dbRestaurants:
+                restDate = rest['date']
+                restDateConverted = datetime.strptime(restDate, DATE_FORMAT)
+                if (restDate == CURRENT_DATE):
+                    data.insert(0, rest)
+            return JSONEncoder().encode(data)
+        except:
+            return "Bad Request", 400
 
 
 rest = flask_app.model(
@@ -107,7 +113,7 @@ rest = flask_app.model(
 class AddNew(Resource):
     @flask_app.doc(responses={
         200: 'OK',
-        400: 'Invalid argument'
+        400: 'Bad Request'
     },
                    description="Create new restaurant",
                    body=rest)
@@ -116,29 +122,41 @@ class AddNew(Resource):
             result = db.custom.insert_one(request.json["restaurant"])
             return str(result.inserted_id)
         except:
-            return "Invalid Argument", 400
+            return "Bad Request", 400
 
 
 @restaurants_name_space.route("/id/<_id>")  # Define the route
 class Restaurant(Resource):
-    @flask_app.doc(responses={200: 'OK'},
+    @flask_app.doc(responses={
+        200: 'OK',
+        400: 'Bad Request'
+    },
                    description="Get the restaurant by id"
                    )  # Documentation of route
     def get(self, _id):  # GET method of REST
-        restaurant = db.custom.find_one({"_id": ObjectId(_id)})
-        if not restaurant:
-            restaurant = restaurants.find_one({"_id": ObjectId(_id)})
-        return json.dumps(restaurant, default=json_util.default)
+        try:
+            restaurant = db.custom.find_one({"_id": ObjectId(_id)})
+            if not restaurant:
+                restaurant = restaurants.find_one({"_id": ObjectId(_id)})
+            return json.dumps(restaurant, default=json_util.default)
+        except:
+            return "Bad Request", 400
 
 
 @geolocation_name_space.route("/<_address>")  # Define the route
 class Geolocation(Resource):
-    @flask_app.doc(responses={200: 'OK'},
+    @flask_app.doc(responses={
+        200: 'OK',
+        400: 'Bad Request'
+    },
                    description="Get the geolocation coordinates"
                    )  # Documentation of route
     def get(self, _address):  # GET method of REST
-        url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(
-            _address) + '?format=json'
-        response = requests.get(url).json()
-        latlng = [response[0]["lat"], response[0]["lon"]]
-        return json.dumps(latlng)
+        try:
+            url = 'https://nominatim.openstreetmap.org/search/' + urllib.parse.quote(
+                _address) + '?format=json'
+            response = requests.get(url).json()
+            latlng = [response[0]["lat"], response[0]["lon"]]
+            return json.dumps(latlng)
+        except:
+            return "Bad Request", 400
