@@ -35,11 +35,16 @@ import { mapGetters, mapMutations } from 'vuex'
     },
     async created() {
       this.restaurant = JSON.parse(this.getRestaurant)
-      if (this.restaurant.custom) {
-          this.loading = true;
-          this.latlng = await this.$store.dispatch('location/getLocation', this.restaurant.location)
-          this.latlng = JSON.parse(this.latlng)
-          this.loading = false;
+      try {
+        if (this.restaurant.custom) {
+            this.loading = true;
+            this.latlng = await this.$store.dispatch('location/getLocation', this.restaurant.location)
+            this.latlng = JSON.parse(this.latlng)
+            this.loading = false;
+        }
+      } catch(error) {
+        this.latlng = ["50.0755", "14.4378"]
+        this.loading = false;
       }
     },
     computed: {
