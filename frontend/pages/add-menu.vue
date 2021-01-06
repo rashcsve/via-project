@@ -141,13 +141,12 @@ export default {
       this.restaurant.dishes = [...this.dishes];
       this.restaurant.date = new Date().toISOString().slice(0,10);
       try {
-        const response = await this.$axios.$post(
+        const response = await this.$axios.post(
           'new',
           { "restaurant": { ...this.restaurant } },
           { headers:
             {
-              'Content-Type': 'application/json',
-              "Access-Control-Allow-Origin": "*"
+              'Content-Type': 'application/json'
             }
           }
         )
