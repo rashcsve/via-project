@@ -128,6 +128,27 @@ button,
   padding-bottom: 32px;
   justify-content: flex-start;
 }
+.container__docs {
+  p {
+    margin: 0 auto;
+    width: 90%;
+    text-align: center;
+    line-height: 1.2;
+  }
+  h3 {
+    margin: 16px auto 8px;
+  }
+  ul {
+    text-align: center;
+    line-height: 1.3;
+  }
+  a {
+    color: $color-violet;
+    &:hover {
+      color: $color-red;
+    }
+  }
+}
 .container--form {
   justify-content: flex-start;
 }
@@ -231,6 +252,16 @@ button,
   &--index {
     margin: auto;
     margin-bottom: 16px;
+  }
+  &--docs {
+    padding-top: 32px;
+    margin: 64px auto 0;
+    a {
+      color: $color-white;
+    }
+    a:hover {
+      color: $color-white;
+    }
   }
   @media screen and (max-width: $tablet) {
     flex-flow: column;
